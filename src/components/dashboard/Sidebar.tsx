@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Building, Users, CreditCard, Dumbbell, LogOut, Menu, X } from "lucide-react";
+import { Building, Users, CreditCard, Dumbbell, LogOut, Menu, X, ClipboardList } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { removeLocalStorage } from "@/lib/storage";
 import { useState, useEffect } from "react";
@@ -90,6 +90,11 @@ export function Sidebar() {
             href="/dashboard/pagos" 
             icon={<CreditCard className="h-5 w-5" />} 
             label="Pagos" 
+          />
+          <SidebarItem 
+            href="/dashboard/logs" 
+            icon={<ClipboardList className="h-5 w-5" />} 
+            label="Logs" 
           />
         </div>
         

@@ -13,88 +13,32 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-
-type Log = {
-  level: string;
-  _id: string;
-  message: string;
-  action: string;
-  createdAt: string;
-  __v: number;
-};
+import { ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
+import { fetchLogs, Log } from "@/lib/api/logs";
 
 export default function LogsList() {
   const [logs, setLogs] = useState<Log[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const logsPerPage = 50;
+  const [error, setError] = useState<string | null>(null);
+
+  const getLogs = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchLogs();
+      setLogs(data);
+    } catch (err) {
+      setError("Error al cargar los logs");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    // Simulando carga de datos
-    const timer = setTimeout(() => {
-      // Datos mockeados - aquí añadiremos más logs para simular la necesidad de paginación
-      const mockLogs: Log[] = [
-        {
-          level: "info",
-          _id: "67fe7b79dcd50173ac425c07",
-          message: "Se llamó a getAllProfesores",
-          action: "Get All Profesores",
-          createdAt: "2024-04-15T15:30:01.455Z",
-          __v: 0
-        },
-        {
-          level: "info",
-          _id: "67fe7b79dcd50173ac425c16",
-          message: "Se llamó a getAllProfesores",
-          action: "Get All Profesores",
-          createdAt: "2024-04-15T15:30:01.670Z",
-          __v: 0
-        },
-        {
-          level: "error",
-          _id: "67fe80db4e421f9760a3a4fa",
-          message: "Error al acceder a la base de datos",
-          action: "Get Rutina",
-          createdAt: "2024-04-15T15:52:59.042Z",
-          __v: 0
-        },
-        {
-          level: "warning",
-          _id: "67fe80db4e421f9760a3a4fb",
-          message: "Intento de acceso no autorizado",
-          action: "Login Attempt",
-          createdAt: "2024-04-15T16:22:10.042Z",
-          __v: 0
-        },
-        {
-          level: "info",
-          _id: "67fe80db4e421f9760a3a4fc",
-          message: "Usuario creado correctamente",
-          action: "Create User",
-          createdAt: "2024-04-15T16:45:20.042Z",
-          __v: 0
-        }
-      ];
-      
-      // Generar más logs para simular una lista grande que necesita paginación
-      const extraLogs: Log[] = [];
-      for (let i = 0; i < 100; i++) {
-        extraLogs.push({
-          level: ["info", "warning", "error"][Math.floor(Math.random() * 3)],
-          _id: `extra-log-${i}`,
-          message: `Log generado automáticamente #${i}`,
-          action: `Acción Simulada ${i}`,
-          createdAt: new Date(2024, 3, Math.floor(Math.random() * 30) + 1).toISOString(),
-          __v: 0
-        });
-      }
-      
-      setLogs([...mockLogs, ...extraLogs]);
-      setLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
+    getLogs();
   }, []);
 
   // Ordenar logs por fecha (los más recientes primero)
@@ -260,6 +204,19 @@ export default function LogsList() {
 
   return (
     <div className="space-y-4">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">Registros del sistema</h2>
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={getLogs} 
+          disabled={loading}
+          className="flex items-center gap-2"
+        >
+          <RefreshCw className="h-4 w-4" />
+          {loading ? "Cargando..." : "Recargar"}
+        </Button>
+      </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -277,6 +234,12 @@ export default function LogsList() {
                   Cargando logs...
                 </TableCell>
               </TableRow>
+            ) : error ? (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center py-10 text-red-500">
+                  {error}
+                </TableCell>
+              </TableRow>
             ) : logs.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={4} className="text-center py-10">
@@ -287,17 +250,17 @@ export default function LogsList() {
               currentLogs.map((log) => (
                 <TableRow key={log._id}>
                   <TableCell>
-                    <Badge variant={getBadgeVariant(log.level)}>
-                      {log.level}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{log.message}</TableCell>
-                  <TableCell>{log.action}</TableCell>
-                  <TableCell>
                     {format(new Date(log.createdAt), "HH:mm:ss - MMM dd", {
                       locale: es
                     })}
                   </TableCell>
+                  <TableCell>{log.message}</TableCell>
+                  <TableCell>
+                    <Badge variant={getBadgeVariant(log.level)}>
+                      {log.level}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{log.action}</TableCell>
                 </TableRow>
               ))
             )}
@@ -305,13 +268,13 @@ export default function LogsList() {
         </Table>
       </div>
 
-      {!loading && logs.length > 0 && totalPages > 1 && (
+      {!loading && !error && logs.length > 0 && totalPages > 1 && (
         <div className="flex justify-center gap-2">
           {generarBotonesPaginacion()}
         </div>
       )}
       
-      {!loading && logs.length > 0 && (
+      {!loading && !error && logs.length > 0 && (
         <div className="text-sm text-muted-foreground text-center">
           Mostrando {indexOfFirstLog + 1}-{Math.min(indexOfLastLog, logs.length)} de {logs.length} logs
         </div>

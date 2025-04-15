@@ -1,0 +1,5 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" fill="#000000"/>
+  <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" font-family="Arial" font-size="170" fill="white">GYM</text>
+  <path d="M256 80C152.9 80 69.33 163.57 69.33 266.67C69.33 369.77 152.9 453.33 256 453.33C359.1 453.33 442.67 369.77 442.67 266.67C442.67 163.57 359.1 80 256 80ZM256 133.33C329.6 133.33 389.33 193.07 389.33 266.67C389.33 340.27 329.6 400 256 400C182.4 400 122.67 340.27 122.67 266.67C122.67 193.07 182.4 133.33 256 133.33Z" fill="#ffffff"/>
+</svg> 

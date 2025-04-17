@@ -3,6 +3,7 @@
 import { useState, ReactNode } from "react"
 import { TableRow, TableCell } from "@/components/ui/table"
 import { ChevronDown, ChevronUp } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
 
 interface ExpandableTableRowProps {
   cells: ReactNode[]
@@ -48,13 +49,39 @@ export function ExpandableTableRow({
         </TableCell>
       </TableRow>
       
-      {expanded && (
-        <TableRow key={`details-${id}`}>
-          <TableCell colSpan={cells.length + 1} className="bg-muted/30 p-4">
-            {detailContent}
-          </TableCell>
-        </TableRow>
-      )}
+      <TableRow className="overflow-hidden p-0">
+        <TableCell colSpan={cells.length + 1} className="p-0 border-0">
+          <AnimatePresence initial={false}>
+            {expanded && (
+              <motion.div
+                key={`details-${id}`}
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ 
+                  height: "auto", 
+                  opacity: 1, 
+                  transition: { 
+                    height: { duration: 0.3 }, 
+                    opacity: { duration: 0.2, delay: 0.1 } 
+                  }
+                }}
+                exit={{ 
+                  height: 0, 
+                  opacity: 0,
+                  transition: { 
+                    height: { duration: 0.3 }, 
+                    opacity: { duration: 0.1 } 
+                  }
+                }}
+                className="bg-muted/30 overflow-hidden"
+              >
+                <div className="p-4">
+                  {detailContent}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </TableCell>
+      </TableRow>
     </>
   )
 } 

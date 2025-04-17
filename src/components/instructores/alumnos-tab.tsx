@@ -5,9 +5,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Search } from 'lucide-react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ExpandableTableRow } from '@/components/ui/expandable-table-row'
+import { SearchBar } from '@/components/ui/searchbar'
 
 interface AlumnosTabProps {
   alumnos: any[]
@@ -128,15 +128,11 @@ export function AlumnosTab({ alumnos, alumnosLoading, instructores, instructorAc
         </div>
       ) : (
         <>
-          <div className="relative">
-            <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Buscar por nombre o apellido..."
-              value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
-              className="pl-8"
-            />
-          </div>
+          <SearchBar
+            placeholder="Buscar por nombre o apellido..."
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+          />
           
           <div className="rounded-md border">
             <Table>
